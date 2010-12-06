@@ -1,4 +1,4 @@
-=== TinyMCE Preformatted ===
+=== WP Weather Hacks ===
 Contributors: miyauchi
 Donate link: http://firegoby.theta.ne.jp/
 Tags: weather, sidebar, widget
