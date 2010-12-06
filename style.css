@@ -1,0 +1,19 @@
+.weather-block {
+    padding-bottom: 10px;
+}
+
+.wtr {
+    width: 33%;
+    float: left;
+    text-align: center;
+    font-size: 80%;
+}
+
+.wtr-max {
+    color: #ff3333;
+}
+
+.wtr-min {
+    color: #3333ff;
+}
+
