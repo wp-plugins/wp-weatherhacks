@@ -119,7 +119,7 @@ add_action(
     function(){
         $url = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
         $css = $url.'/style.css';
-        echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'">';
+        echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'" />';
     }
 );
 
