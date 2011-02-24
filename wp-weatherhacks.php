@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: WP Weather Hacks
+Plugin Name: Weather Hacks
 Plugin URI: http://firegoby.theta.ne.jp/wp/weatherhacks
-Description: ライブドアのWeather Hacksを利用して天気予報を表示するサイドバーウィジェット
+Description: ライブドアのWeatherHacksのサイドバーウィジェット
 Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
 Version: 0.1
 Author URI: http://firegoby.theta.ne.jp/
@@ -106,7 +106,9 @@ class WeatherHacksWidget extends WP_Widget {
 
 function weatherHacksLoadCSS(){
     $url = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
-    echo $url;
+    $css = $url.'/style.css';
+    echo "<!--wp weather hacks-->";
+    echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'">';
 }
 
 add_action(
@@ -116,11 +118,7 @@ add_action(
 
 add_action(
     'wp_head',
-    function(){
-        $url = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
-        $css = $url.'/style.css';
-        echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'" />';
-    }
+    'weatherHacksLoadCSS'
 );
 
 ?>
