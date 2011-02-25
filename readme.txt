@@ -4,7 +4,7 @@ Donate link: http://firegoby.theta.ne.jp/
 Tags: weather, sidebar, widget
 Requires at least: 3.0
 Tested up to: 3.1
-Stable tag: 0.1
+Stable tag: 0.2
 
 Display weather reports in the sidebar.
 
