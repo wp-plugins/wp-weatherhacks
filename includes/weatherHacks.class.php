@@ -3,7 +3,6 @@
 class weatherHacks{
 
 private $cityID = 0;
-private $cachedir = '';
 private $cache_lifetime = 3600;
 
 private $url = 'http://weather.livedoor.com/forecast/webservice/rest/v1?city=%d&day=%s';
@@ -27,37 +26,18 @@ function __construct($cityID, $day = null)
     }
 }
 
-public function setCache($cachedir, $lifetime = null)
+public function get_data()
 {
-    if (is_dir($cachedir) && is_writeable($cachedir)) {
-        $this->cachedir = $cachedir;
-    } else {
-        throw new Exception($cachedir.' が存在しないか書き込み権限がありません。', 200);
+    $data = get_transient('weatherhacks-'.$this->cityID);
+    if ($data) {
+        return $data;
     }
-    if ($lifetime) {
-        $this->cache_lifetime = $lifetime;
-    }
-}
 
-public function getArray()
-{
     $data = array();
     foreach ($this->days as $d) {
         $xml = sprintf($this->url, $this->cityID, $d);
-        $cache = $this->cachedir.'/'.md5($xml);
         $dom = new DOMDocument();
-        if (is_file($cache)) {
-            $st = stat($cache);
-            if ($st['mtime'] > (time()-$this->cache_lifetime)) {
-                $dom->load($cache);
-            } else {
-                $dom->load($xml);
-                file_put_contents($cache, file_get_contents($xml));
-            }
-        } else {
-            $dom->load($xml);
-            file_put_contents($cache, file_get_contents($xml));
-        }
+        $dom->load($xml);
 
         $image = $dom->getElementsByTagName('image')->item(0);
         $temp = $dom->getElementsByTagName('temperature')->item(0);
@@ -104,7 +84,52 @@ public function getArray()
         );
     }
 
-    return $data;
+    $html  = '';
+    $i     = 0;
+    $title = array(
+        '今日',
+        '明日',
+        'あさって',
+    );
+    $tpl = $this->get_template();
+    foreach ($data as $d) {
+        $o = $tpl;
+        $o = str_replace("%title%", $title[$i], $o);
+        $o = str_replace('%img%', $d['img'], $o);
+        $o = str_replace('%width%', $d['width'], $o);
+        $o = str_replace('%height%', $d['height'], $o);
+        $o = str_replace('%weather%', $d['weather'], $o);
+        if ($d['max']) {
+            $o = str_replace('%max%', $d['max'], $o);
+        } else {
+            $o = str_replace('%max%', '-', $o);
+        }
+        if ($d['min']) {
+            $o = str_replace('%min%', $d['min'], $o);
+        } else {
+            $o = str_replace('%min%', '-', $o);
+        }
+        $html .= $o;
+        $i++;
+    }
+    set_transient('weatherhacks-'.$this->cityID, $html, $this->cache_lifetime);
+    return $html;
+}
+
+private function get_template()
+{
+    return '<div class="wtr">
+    <div class="wtr-title">%title%</div>
+    <div class="wtr-image">
+        <img src="%img%" width="%width%" height="%height%" title="%weather%">
+    </div>
+    <div class="wtr-content">%weather%</div>
+    <div class="wtr-temp">
+        <span class="wtr-max">%max%&#8451;</span>
+        / 
+        <span class="wtr-min">%min%&#8451;</span>
+    </div>
+</div>';
 }
 
 private function getCelsius($node){
@@ -113,4 +138,4 @@ private function getCelsius($node){
 
 }
 
-?>
+// eof

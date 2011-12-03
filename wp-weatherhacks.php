@@ -4,12 +4,11 @@ Plugin Name: Weather Hacks
 Plugin URI: http://firegoby.theta.ne.jp/wp/weatherhacks
 Description: ライブドアのWeatherHacksのサイドバーウィジェット
 Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
-Version: 0.2
+Version: 0.3
 Author URI: http://firegoby.theta.ne.jp/
 */
 
 require_once(dirname(__FILE__).'/includes/weatherHacks.class.php');
-require_once(dirname(__FILE__).'/includes/tinyTemplate.php');
 
 class WeatherHacksWidget extends WP_Widget {
 
@@ -22,7 +21,14 @@ class WeatherHacksWidget extends WP_Widget {
 
     public function form($instance) {
         // outputs the options form on admin
-        $cityID = esc_attr($instance['city']);
+        if (isset($instance['city']) && intval($instance['city'])) {
+            $cityID = intval($instance['city']);
+        } else {
+            $cityID = 0;
+        }
+        if (!isset($instance['title']) || !$instance['city']) {
+            $instance['title'] = '';
+        }
         $pfield = $this->get_field_id('city');
         $pfname = $this->get_field_name('city');
         echo 'タイトル:';
@@ -62,63 +68,86 @@ class WeatherHacksWidget extends WP_Widget {
 
     public function widget($args, $instance) {
         extract($args);
-        $wh = new weatherHacks($instance['city']);
-	    $upload = wp_upload_dir();
-        $wh->setCache($upload['basedir'], 3600);
-        $w = $wh->getArray();
-        if ($w) {
-            echo $before_widget;
-            echo $before_title . $instance['title'] . $after_title;
-            echo "<div class=\"weather-block\">";
-            $i = 0;
-            $title = array(
-                '今日',
-                '明日',
-                'あさって',
-            );
-            foreach ($w as $d) {
-                $tpl = new TinyTemplate();
-                $tpl->set('title', $title[$i]);
-                $tpl->set('img', $d['img']);
-                $tpl->set('width', $d['width']);
-                $tpl->set('height', $d['height']);
-                $tpl->set('weather', $d['weather']);
-                if ($d['max']) {
-                    $tpl->set('max', $d['max']);
-                } else {
-                    $tpl->set('max', '-');
-                }
-                if ($d['min']) {
-                    $tpl->set('min', $d['min']);
-                } else {
-                    $tpl->set('min', '-');
-                }
-                echo $tpl->fetch(dirname(__FILE__).'/'.$this->template);
-                $i++;
-            }
-            echo '<br clear="all" />';
-            echo "</div>";
-            echo $after_widget;
-        }
+        $id = intval($instance['city']);
+        echo $before_widget;
+        echo $before_title . $instance['title'] . $after_title;
+        echo '<div class="weather-block" id="weatherhacks-'.$id.'">';
+        echo "</div>";
+        echo $after_widget;
     }
-
 }
 
-function weatherHacksLoadCSS(){
-    $url = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
-    $css = $url.'/style.css';
-    echo "<!--wp weather hacks-->";
+
+
+new wetherHacks();
+
+class wetherHacks {
+
+function __construct()
+{
+    add_action('init', array(&$this, "init"));
+    add_action('widgets_init', array(&$this, "widgets_init"));
+    add_action('wp_head', array(&$this, 'wp_head'));
+    add_action('wp_footer', array(&$this, 'wp_footer'));
+    add_action('wp_ajax_weatherhacks', array(&$this, 'wp_ajax'));
+    add_action('wp_ajax_nopriv_weatherhacks', array(&$this, 'wp_ajax'));
+}
+
+public function init()
+{
+    if (!is_admin()) {
+        wp_enqueue_script('jquery');
+    }
+}
+
+public function widgets_init()
+{
+    return register_widget("WeatherHacksWidget");
+}
+
+public function wp_head()
+{
+    $url = plugins_url('', __FILE__);
+    $css = $url.'/style.css?ver='.filemtime(dirname(__FILE__).'/style.css');
     echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'">';
 }
 
-add_action(
-    'widgets_init',
-    create_function('', 'return register_widget("WeatherHacksWidget");')
-);
+public function wp_ajax()
+{
+    nocache_headers();
+    if (wp_verify_nonce($_GET['nonce'], 'weatherhacks')) {
+        if (isset($_GET['city']) && intval($_GET['city'])) {
+            $wh = new weatherHacks(intval($_GET['city']));
+            echo $wh->get_data();
+        }
+    }
+    exit;
+}
 
-add_action(
-    'wp_head',
-    'weatherHacksLoadCSS'
-);
-
+public function wp_footer()
+{
 ?>
+<script type="text/javascript">
+/* <![CDATA[ */
+<?php
+    $url = admin_url('admin-ajax.php');
+    $url = add_query_arg("action", "weatherhacks", $url);
+    $url = add_query_arg("nonce", wp_create_nonce("weatherhacks"), $url);
+?>
+var url = '<?php echo $url; ?>';
+jQuery(".weather-block").each(function(){
+    var obj = jQuery(this);
+    var id = jQuery(this).attr("id").substr("weatherhacks-".length);
+    var req = url + '&city=' + id;
+    jQuery.get(req, function(data){
+        obj.html(data);
+    });
+});
+/* ]]> */
+</script>
+<?php
+}
+
+}
+
+// eof
