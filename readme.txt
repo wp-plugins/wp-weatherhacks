@@ -4,7 +4,7 @@ Donate link: http://firegoby.theta.ne.jp/
 Tags: weather, sidebar, widget
 Requires at least: 3.2
 Tested up to: 3.2
-Stable tag: 0.3
+Stable tag: 0.4
 
 Display weather reports in the sidebar.
 
@@ -12,7 +12,7 @@ Display weather reports in the sidebar.
 
 Display weather reports in the sidebar from Livedoor weather API.
 
-Sorry! Japanese only.
+Sorry! This plugin is supported in Japanese only.
 
 * [Plugin Homepage](http://firegoby.theta.ne.jp/wp/weatherhacks) (Japanese)
 * [Support](http://wordpress.org/tags/wp-weatherhacks)

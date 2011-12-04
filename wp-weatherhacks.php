@@ -4,7 +4,7 @@ Plugin Name: Weather Hacks
 Plugin URI: http://firegoby.theta.ne.jp/wp/weatherhacks
 Description: ライブドアのWeatherHacksのサイドバーウィジェット
 Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
-Version: 0.3
+Version: 0.4
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -87,7 +87,7 @@ function __construct()
 {
     add_action('init', array(&$this, "init"));
     add_action('widgets_init', array(&$this, "widgets_init"));
-    add_action('wp_head', array(&$this, 'wp_head'));
+    add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
     add_action('wp_footer', array(&$this, 'wp_footer'));
     add_action('wp_ajax_weatherhacks', array(&$this, 'wp_ajax'));
     add_action('wp_ajax_nopriv_weatherhacks', array(&$this, 'wp_ajax'));
@@ -105,11 +105,16 @@ public function widgets_init()
     return register_widget("WeatherHacksWidget");
 }
 
-public function wp_head()
+public function wp_print_styles()
 {
-    $url = plugins_url('', __FILE__);
-    $css = $url.'/style.css?ver='.filemtime(dirname(__FILE__).'/style.css');
-    echo '<link rel="stylesheet" type="text/css" media="all" href="'.$css.'">';
+    $url = plugins_url('style.css', __FILE__);
+    wp_enqueue_style(
+        'weatherhacks',
+        $url,
+        array(),
+        filemtime(dirname(__FILE__).'/style.css'),
+        'all'
+    );
 }
 
 public function wp_ajax()
