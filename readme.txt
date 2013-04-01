@@ -1,21 +1,21 @@
 === WP Weather Hacks ===
 Contributors: miyauchi
-Donate link: http://firegoby.theta.ne.jp/
+Donate link: http://firegoby.jp/
 Tags: weather, sidebar, widget
-Requires at least: 3.2
-Tested up to: 3.2
-Stable tag: 0.3
+Requires at least: 3.4
+Tested up to: 3.5
+Stable tag: 0.7
 
 Display weather reports in the sidebar.
 
 == Description ==
 
 Display weather reports in the sidebar from Livedoor weather API.
-
 Sorry! Japanese only.
 
-* [Plugin Homepage](http://firegoby.theta.ne.jp/wp/weatherhacks) (Japanese)
+* [Plugin Homepage](http://firegoby.jp/wp/weatherhacks) (Japanese)
 * [Support](http://wordpress.org/tags/wp-weatherhacks)
+* [GitHub](https://github.com/miya0001/wp-weatherhacks)
 
 == Installation ==
 
@@ -35,5 +35,5 @@ The author must acknowledge the thing that the operation guarantee and the suppo
 
 == Contact ==
 
-email to miya[at]theta.ne.jp
+twitter @miya0001
 
